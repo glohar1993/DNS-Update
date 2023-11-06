@@ -6,7 +6,7 @@ import os
 client = boto3.client('route53')
 
 # Provide your hosted zone ID here
-hosted_zone_id = 'YOUR_HOSTED_ZONE_ID'  # Replace with your actual hosted zone ID
+hosted_zone_id = 'Z04395233QIU1MNFUZO2'  # Replace with your actual hosted zone ID
 
 def get_record_value(record_name, record_type='CNAME'):
     """Retrieve the value for a specific DNS record."""
