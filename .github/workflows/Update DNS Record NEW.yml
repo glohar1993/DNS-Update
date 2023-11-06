@@ -37,4 +37,4 @@ jobs:
           DESTINATION_RECORD_NAME: ${{ github.event.inputs.destination_record_name }}
           RECORD_TYPE: ${{ github.event.inputs.record_type }}
         run: |
-          python3 update_route53_dns1.py
+          python3 update_route53_dnsV1.py.py
