@@ -1,0 +1,40 @@
+name: Update DNS Record
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_record_name:
+        description: 'Source Record Name'
+        required: true
+      destination_record_name:
+        description: 'Destination Record Name'
+        required: true
+      record_type:
+        type: choice
+        description: 'Type of DNS Record'
+        required: true
+        options:
+          - 'A'
+          - 'CNAME'
+
+jobs:
+  update-dns:
+    runs-on: DNS  # This will use your self-hosted runner
+    name: Update Route53 DNS Record
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          pip install boto3
+          
+      - name: Run the update script
+        env:
+          AWS_REGION: 'us-east-1'  # Replace with your AWS region if it's not us-east-1
+          HOSTED_ZONE_ID: ${{ secrets.HOSTED_ZONE_ID }}  # Set in your GitHub repository secrets
+          SOURCE_RECORD_NAME: ${{ github.event.inputs.source_record_name }}
+          DESTINATION_RECORD_NAME: ${{ github.event.inputs.destination_record_name }}
+          RECORD_TYPE: ${{ github.event.inputs.record_type }}
+        run: |
+          python3 update_route53_dns1.py
