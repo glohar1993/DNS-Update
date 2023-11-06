@@ -12,19 +12,19 @@ on:
 
 jobs:
   update-dns:
-    runs-on: DNS  # This should match your self-hosted runner's label
+    runs-on: DNS  # Make sure this matches the label of your self-hosted runner
     name: Update Route53 DNS Record
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
-      - name: Install dependencies
+      
+      - name: Install Boto3
         run: |
-          pip install boto3
+          python -m pip install boto3
           
       - name: Update DNS Record
         env:
-          AWS_REGION: 'us-east-1'  # Replace with your AWS region if different
+          AWS_REGION: 'us-east-1'  # Replace with the AWS region your Route 53 is hosted in, if it's different
           SOURCE_CNAME: ${{ github.event.inputs.source_cname }}
           DESTINATION_CNAME: ${{ github.event.inputs.destination_cname }}
         run: |
