@@ -1,4 +1,4 @@
-name: Update DNS Record with Approval
+name: Update DNS Record
 
 on:
   workflow_dispatch:
@@ -11,31 +11,21 @@ on:
         required: true
 
 jobs:
-  request-approval:
-    runs-on: DNS
-    environment:
-      name: staging
-    outputs:
-      source_cname: ${{ github.event.inputs.source_cname }}
-      destination_cname: ${{ github.event.inputs.destination_cname }}
-    steps:
-      - name: Print input details
-        run: |
-          echo "Source CNAME: ${{ github.event.inputs.source_cname }}"
-          echo "Destination CNAME: ${{ github.event.inputs.destination_cname }}"
-      
-      - name: Checkout code
-        uses: actions/checkout@v2
-      
-      - name: Wait for approval
-        run: echo "Workflow is awaiting approval."
-
   update-dns:
-    needs: request-approval
-    runs-on: self-hosted
+    runs-on: self-hosted  # Use your self-hosted runner label here
+    name: Update Route53 DNS Record
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-
+      
+      - name: Install dependencies (if not already installed)
+        run: |
+          pip install boto3
+          
       - name: Run the update script
-        run: python3 update_route53_dns.py ${{ needs.request-approval.outputs.source_cname }} ${{ needs.request-approval.outputs.destination_cname }}
+        env:
+          AWS_REGION: 'us-east-1'  # Replace with your AWS region if it's not us-east-1
+          SOURCE_CNAME: ${{ github.event.inputs.source_cname }}
+          DESTINATION_CNAME: ${{ github.event.inputs.destination_cname }}
+        run: |
+          python update_route53_dns.py  # Ensure this script is executable and present in your repository
