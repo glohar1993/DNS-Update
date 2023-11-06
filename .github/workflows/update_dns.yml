@@ -28,4 +28,4 @@ jobs:
           SOURCE_CNAME: ${{ github.event.inputs.source_cname }}
           DESTINATION_CNAME: ${{ github.event.inputs.destination_cname }}
         run: |
-          python3 update_route53_dns.py  # Ensure this script is executable and present in your repository
+          python3 update_route53_dns.py 
