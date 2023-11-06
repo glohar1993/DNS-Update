@@ -1,0 +1,36 @@
+name: Update DNS Record
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_cname:
+        description: 'Source CNAME Record'
+        required: true
+      destination_cname:
+        description: 'Destination CNAME Record'
+        required: true
+
+jobs:
+  update-dns:
+    runs-on: DNS  # This should match your self-hosted runner's label
+    name: Update Route53 DNS Record
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'  # Ensure this matches the Python version on your runner
+      
+      - name: Install dependencies
+        run: |
+          pip install boto3
+          
+      - name: Update DNS Record
+        env:
+          AWS_REGION: 'us-east-1'  # Replace with your AWS region if different
+          SOURCE_CNAME: ${{ github.event.inputs.source_cname }}
+          DESTINATION_CNAME: ${{ github.event.inputs.destination_cname }}
+        run: |
+          python update_route53_dns.py
