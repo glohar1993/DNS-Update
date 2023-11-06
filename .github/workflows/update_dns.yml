@@ -1,4 +1,4 @@
-name: Update DNS Record
+name: Update DNS Record with Approval
 
 on:
   workflow_dispatch:
@@ -15,18 +15,20 @@ jobs:
     runs-on: DNS
     environment:
       name: staging
-      # The 'staging' should be an environment set up in your GitHub repository settings that requires approval
     outputs:
       source_cname: ${{ github.event.inputs.source_cname }}
       destination_cname: ${{ github.event.inputs.destination_cname }}
     steps:
+      - name: Print input details
+        run: |
+          echo "Source CNAME: ${{ github.event.inputs.source_cname }}"
+          echo "Destination CNAME: ${{ github.event.inputs.destination_cname }}"
+      
       - name: Checkout code
         uses: actions/checkout@v2
       
       - name: Wait for approval
-        run: |
-          echo "Workflow is awaiting approval."
-          # No action needed, GitHub will hold the workflow at this step until approval is granted in the environment settings
+        run: echo "Workflow is awaiting approval."
 
   update-dns:
     needs: request-approval
@@ -34,20 +36,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-
-      - name: Print the details provided during approval
-        run: |
-          echo "Source CNAME: ${{ needs.request-approval.outputs.source_cname }}"
-          echo "Destination CNAME: ${{ needs.request-approval.outputs.destination_cname }}"
-
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.7' # Replace with the version pre-installed on your self-hosted runner if necessary
-
-      - name: Install dependencies
-        run: |
-          pip install boto3
 
       - name: Run the update script
         run: python3 update_route53_dns.py ${{ needs.request-approval.outputs.source_cname }} ${{ needs.request-approval.outputs.destination_cname }}
